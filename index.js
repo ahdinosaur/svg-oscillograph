@@ -23,7 +23,7 @@ function oscilloscope (opts) {
     return h('svg', {
       height: '100%',
       width: '100%',
-      viewBox: '0 -1 1 2',
+      viewBox: '0 0 1 1',
       preserveAspectRatio: 'none'
     }, [
       h('defs', [
@@ -32,11 +32,12 @@ function oscilloscope (opts) {
       h('g', {
         fill: defined(
           fillDef && getDefId(fillDef),
-          fill, 'magenta'
+          fill,
+          'magenta'
         ),
       }, getFrequencies(state.frequencies).data
         .map(function (p) {
-          if (!p[2]) { return }
+          if (p[2] < 1e-5) return
           return h('circle', {
             cx: p[0],
             cy: p[1],
@@ -61,9 +62,9 @@ function oscilloscope (opts) {
         var a = Math.floor(y / opts.shape[1] * array.shape[1])
         for (var c = 0; c < array.shape[2]; c++) {
           ret.set(x, y, c, new Float32Array([
-            t / array.shape[0],
-            a / array.shape[1],
-            array.get(t, a, c)
+            1 - t / array.shape[0],
+            Math.pow(a, 4) / Math.pow(array.shape[1], 4),
+            Math.log(array.get(t, a, c)) / 1e2
           ]))
         }
       }
