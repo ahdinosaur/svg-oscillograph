@@ -38,10 +38,11 @@ function oscilloscope (opts) {
       }, getFrequencies(state.frequencies).data
         .map(function (p) {
           if (p[2] < 1e-5) return
-          return h('circle', {
-            cx: p[0],
-            cy: p[1],
-            r: p[2]
+          return h('rect', {
+            x: p[0],
+            y: p[1],
+            width: p[2],
+            height: p[2]
           })
         })
       )
@@ -82,6 +83,7 @@ function getStrokeDef (fill) {
   if (isVnode(fill)) {
     var fill = fill
     setDefId(fill, 'fill')
+    fill.properties.attributes.gradientUnits = 'userSpaceOnUse'
     return fill
   }
 }

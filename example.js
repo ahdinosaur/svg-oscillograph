@@ -15,7 +15,7 @@ var linearGradientToVsvg = require('linear-gradient-svg')
 var Scope = require('./')
 
 var opts = {
-  buffer: 512,
+  buffer: 256,
   channels: 1,
   inc: 1,
   shape: [64, 64],
@@ -35,11 +35,12 @@ readAudio(opts, function (err, stream) {
 
   var start = 0
   var inc = opts.inc
+  var frameLength = opts.buffer * 8
 
   stream
   .pipe(hop({
-    frame: { shape: [opts.buffer, opts.channels] },
-    hop: { shape: [64, opts.channels] },
+    frame: { shape: [frameLength, opts.channels] },
+    hop: { shape: [opts.buffer, opts.channels] },
     dtype: 'float32',
     stream: {
       highWaterMark: 1
@@ -49,8 +50,8 @@ readAudio(opts, function (err, stream) {
     highWaterMark: 1
   }))
   .pipe(hop({
-    frame: { shape: [opts.shape[0], opts.buffer, opts.channels] },
-    hop: { shape: [opts.shape[0], opts.buffer, opts.channels] },
+    frame: { shape: [opts.shape[0], frameLength, opts.channels] },
+    hop: { shape: [opts.shape[0] / 2, frameLength, opts.channels] },
     dtype: 'float32',
     stream: {
       highWaterMark: 1
