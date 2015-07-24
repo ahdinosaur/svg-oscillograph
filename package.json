@@ -49,6 +49,7 @@
     "through2": "^2.0.0",
     "uglifyify": "^3.0.1",
     "watchify": "^3.1.0",
+    "webworkify": "^1.0.2",
     "writable2": "^0.1.2"
   }
 }

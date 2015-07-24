@@ -5,9 +5,9 @@ var readAudio = require('read-audio')
 var hop = require('ndarray-hop/stream')
 var writable = require('writable2')
 var h = require('virtual-hyperscript-svg')
-var getFrequencies = require('ndsamples-frequencies/stream')
 var through = require('through2')
 var nextTick = require('next-tick')
+var work = require('webworkify')
 
 var rainbowGradient = require('rainbow-linear-gradient')
 var linearGradientToVsvg = require('linear-gradient-svg')
@@ -46,9 +46,7 @@ readAudio(opts, function (err, stream) {
       highWaterMark: 1
     }
   }))
-  .pipe(getFrequencies({
-    highWaterMark: 1
-  }))
+  .pipe(freqWorker())
   .pipe(hop({
     frame: { shape: [opts.shape[0], frameLength, opts.channels] },
     hop: { shape: [opts.shape[0] / 2, frameLength, opts.channels] },
@@ -74,5 +72,23 @@ readAudio(opts, function (err, stream) {
     nextTick(cb)
   }))
 })
+
+function freqWorker () {
+  var w = work(require('./worker'))
+
+  var stream = through.obj({
+    highWaterMark: 1
+  }, function (samples, enc, cb) {
+    w.postMessage(samples)
+    cb()
+  })
+
+  w.addEventListener('message', function (ev) {
+    var arr = ev.data
+    stream.push(ndarray(arr.data, arr.shape, arr.stride, arr.offset))
+  })
+
+  return stream
+}
 
 document.body.appendChild(loop.target)
