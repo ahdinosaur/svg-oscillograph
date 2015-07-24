@@ -37,12 +37,14 @@ function oscilloscope (opts) {
         ),
       }, getFrequencies(state.frequencies).data
         .map(function (p) {
-          if (p[2] < 1e-5) return
+          var width = 1 / opts.shape[0]
+          var height = 1 / opts.shape[1]
           return h('rect', {
-            x: p[0],
-            y: p[1],
-            width: p[2],
-            height: p[2]
+            x: p[0] - width / 2,
+            y: p[1] - height / 2,
+            opacity: p[2],
+            width: width,
+            height: height
           })
         })
       )
@@ -64,12 +66,8 @@ function oscilloscope (opts) {
         for (var c = 0; c < array.shape[2]; c++) {
           ret.set(x, y, c, new Float32Array([
             t / array.shape[0],
-            (a > array.shape[1] / 2) ?
-              Math.pow(a, 2) / Math.pow(array.shape[1], 2) // lows
-            :
-              1 - Math.pow(array.shape[1] - a, 2) / Math.pow(array.shape[1], 2) // highs
-            ,
-            Math.log(array.get(t, a, c)) / 1e2
+            a / array.shape[1],
+            Math.log(array.get(t, a, c))
           ]))
         }
       }
