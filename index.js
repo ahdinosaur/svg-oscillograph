@@ -62,7 +62,7 @@ function oscilloscope (opts) {
         var a = Math.floor(y / opts.shape[1] * array.shape[1])
         for (var c = 0; c < array.shape[2]; c++) {
           ret.set(x, y, c, new Float32Array([
-            1 - t / array.shape[0],
+            t / array.shape[0],
             (a > array.shape[1] / 2) ?
               Math.pow(a, 2) / Math.pow(array.shape[1], 2) // lows
             :
