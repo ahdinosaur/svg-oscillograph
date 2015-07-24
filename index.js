@@ -67,7 +67,7 @@ function oscilloscope (opts) {
           ret.set(x, y, c, new Float32Array([
             t / array.shape[0],
             a / array.shape[1],
-            Math.log(array.get(t, a, c))
+            array.get(t, a, c)
           ]))
         }
       }
