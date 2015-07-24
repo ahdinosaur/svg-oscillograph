@@ -7,6 +7,7 @@ var h = require('virtual-hyperscript-svg')
 var through = require('through2')
 var nextTick = require('next-tick')
 var work = require('webworkify')
+var Slider = require('range-slider')
 
 var rainbowGradient = require('rainbow-linear-gradient')
 var linearGradientToVsvg = require('linear-gradient-svg')
@@ -23,6 +24,15 @@ var loop = main(
   vdom
 )
 
+var zoom = 1
+var slider = Slider(
+  document.querySelector('#slider'),
+  zoom,
+  function (newZoom) {
+    zoom = newZoom
+  }
+)
+
 readAudio(opts, function (err, stream) {
   if (err) { throw err }
 
@@ -34,6 +44,20 @@ readAudio(opts, function (err, stream) {
   .pipe(writable.obj({
     highWaterMark: 1
   }, function (freqs, enc, cb) {
+
+    var min = opts.shape[0]
+    var xShape = Math.max(Math.ceil(freqs.shape[0] * zoom), min)
+    var xOffset = Math.floor(freqs.shape[0] * (1 - zoom))
+    xOffset = freqs.shape[0] - offset < min ? freqs.shape[0] - min : offset
+    var offset = freqs.index(xOffset, 0, 0)
+
+    var frequencies = ndarray(
+      freqs.data,
+      [xShape, freqs.shape[1], freqs.shape[2]],
+      freqs.stride,
+      offset
+    )
+
     loop.update({
       fill: linearGradientToVsvg(
         rainbowGradient({
@@ -41,7 +65,7 @@ readAudio(opts, function (err, stream) {
           length: opts.numStops
         })
       ),
-      frequencies: freqs
+      frequencies: frequencies
     })
 
     start += inc

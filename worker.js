@@ -8,8 +8,8 @@ module.exports = function (self) {
   var frameLength = opts.buffer * 8
 
   var sliceOut = hop({
-    frame: { shape: [opts.shape[0] * 4, frameLength, opts.channels] },
-    hop: { shape: [opts.shape[0] / 4, frameLength, opts.channels] }
+    frame: { shape: [opts.shape[0] * 8, frameLength, opts.channels] },
+    hop: { shape: [opts.shape[0], frameLength, opts.channels] }
   }, function (arr) {
     self.postMessage(arr)
   })
