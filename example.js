@@ -7,6 +7,7 @@ var writable = require('writable2')
 var h = require('virtual-hyperscript-svg')
 var getFrequencies = require('ndsamples-frequencies/stream')
 var through = require('through2')
+var nextTick = require('next-tick')
 
 var rainbowGradient = require('rainbow-linear-gradient')
 var linearGradientToVsvg = require('linear-gradient-svg')
@@ -39,13 +40,21 @@ readAudio(opts, function (err, stream) {
   .pipe(hop({
     frame: { shape: [opts.buffer, opts.channels] },
     hop: { shape: [64, opts.channels] },
-    dtype: 'float32'
+    dtype: 'float32',
+    stream: {
+      highWaterMark: 1
+    }
   }))
-  .pipe(getFrequencies())
+  .pipe(getFrequencies({
+    highWaterMark: 1
+  }))
   .pipe(hop({
     frame: { shape: [opts.shape[0], opts.buffer, opts.channels] },
     hop: { shape: [opts.shape[0], opts.buffer, opts.channels] },
-    dtype: 'float32'
+    dtype: 'float32',
+    stream: {
+      highWaterMark: 1
+    }
   }))
   .pipe(writable.obj({
     highWaterMark: 1
@@ -61,7 +70,7 @@ readAudio(opts, function (err, stream) {
     })
 
     start += inc
-    process.nextTick(cb)
+    nextTick(cb)
   }))
 })
 
