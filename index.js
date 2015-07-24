@@ -39,12 +39,12 @@ function oscilloscope (opts) {
         .map(function (p) {
           var width = 1 / opts.shape[0]
           var height = 1 / opts.shape[1]
-          return h('rect', {
-            x: p[0] - width / 2,
-            y: p[1] - height / 2,
+          return h('ellipse', {
+            cx: p[0],
+            cy: p[1],
             opacity: p[2],
-            width: width,
-            height: height
+            rx: width * 0.75,
+            ry: height * 0.75
           })
         })
       )
@@ -67,7 +67,7 @@ function oscilloscope (opts) {
           ret.set(x, y, c, new Float32Array([
             t / array.shape[0],
             a / array.shape[1],
-            Math.log(array.get(t, a, c))
+            array.get(t, a, c)
           ]))
         }
       }
